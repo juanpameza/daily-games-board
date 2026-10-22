@@ -1,0 +1,69 @@
+const { parseResults } = require('./parser.js');
+const assert = require('assert');
+
+const whatsapp = `[10/21, 4:44 PM] Juanpa Meza: Wordle 1,950 4/6
+
+⬛⬛⬛⬛🟨
+🟩⬛⬛🟨⬛
+🟩⬛🟩⬛⬛
+🟩🟩🟩🟩🟩
+[10/21, 4:44 PM] Juanpa Meza: Perceptle #96 - D (40)
+🔢 3  🎯 4  📐 28  🥁 68  ✂️ 95
+https://perceptle.com
+[10/21, 4:45 PM] Juanpa Meza: Krillion #98 🦐
+200
+
+⬛🦑🫧🦑🦑⬛🫧
+[10/21, 4:45 PM] Juanpa Meza: www.maptap.gg October 21
+80👏 74😂 100🎯 68🤨 80🤗
+Final score: 798
+[10/21, 4:45 PM] Juanpa Meza: Size It Up
+Overall Score 251
+
+⬜⬜⬜⬜⬜ 0
+🟥🟥🟥🟥⬜ 72
+🟥🟥🟥🟥🟥 97
+🟥🟥🟥🟥⬜ 82
+⬜⬜⬜⬜⬜ 0
+https://magnitudle.com/size-it-up`;
+
+const all = parseResults(whatsapp);
+console.log(JSON.stringify(all, null, 1));
+assert.strictEqual(all.length, 5, 'five games from the whatsapp dump');
+
+const byGame = Object.fromEntries(all.map(r => [r.game, r]));
+assert.strictEqual(byGame.wordle.score, 4);
+assert.strictEqual(byGame.wordle.puzzle, 1950);
+assert.strictEqual(byGame.wordle.display, '4/6');
+assert.strictEqual(byGame.wordle.grid.split('\n').length, 4);
+
+assert.strictEqual(byGame.perceptle.score, 40);
+assert.strictEqual(byGame.perceptle.display, 'D (40)');
+assert.deepStrictEqual(byGame.perceptle.rounds.map(r => r.value), [3, 4, 28, 68, 95]);
+assert.deepStrictEqual(byGame.perceptle.rounds.map(r => r.label), ['🔢', '🎯', '📐', '🥁', '✂️']);
+
+assert.strictEqual(byGame.krillion.score, 200);
+assert.strictEqual(byGame.krillion.puzzle, 98);
+assert.strictEqual(byGame.krillion.grid, '⬛🦑🫧🦑🦑⬛🫧');
+
+assert.strictEqual(byGame.maptap.score, 798);
+assert.deepStrictEqual(byGame.maptap.rounds.map(r => r.value), [80, 74, 100, 68, 80]);
+assert.deepStrictEqual(byGame.maptap.rounds.map(r => r.label), ['👏', '😂', '🎯', '🤨', '🤗']);
+
+assert.strictEqual(byGame.sizeitup.score, 251);
+assert.deepStrictEqual(byGame.sizeitup.rounds.map(r => r.value), [0, 72, 97, 82, 0]);
+assert.strictEqual(byGame.sizeitup.rounds[1].bar, '🟥🟥🟥🟥⬜');
+
+// Single pastes straight from each game, no WhatsApp wrapper
+assert.strictEqual(parseResults('Wordle 1,951 X/6*\n\n⬛⬛⬛⬛⬛\n🟨⬛⬛⬛⬛\n🟨🟩⬛⬛⬛\n🟩🟩⬛⬛⬛\n🟩🟩🟩⬛⬛\n🟩🟩🟩🟩⬛')[0].score, 7);
+assert.strictEqual(parseResults('Wordle 1,951 X/6*\n\n⬛⬛⬛⬛⬛')[0].display, 'X/6*');
+assert.strictEqual(parseResults('Krillion #99 🦐\n140')[0].score, 140);
+assert.strictEqual(parseResults('Krillion #99 🦐\n140')[0].grid, null);
+assert.strictEqual(parseResults('www.maptap.gg October 22\n100🎯 55😂 61👏 90🤗 72🤨\nFinal score: 812')[0].score, 812);
+assert.strictEqual(parseResults('Perceptle #97 - A (91)\n🔢 90  🎯 88  📐 95  🥁 92  ✂️ 90\nhttps://perceptle.com')[0].score, 91);
+assert.strictEqual(parseResults('hello there').length, 0);
+
+// Windows line endings and trailing whitespace
+assert.strictEqual(parseResults('Size It Up\r\nOverall Score 300\r\n\r\n🟥🟥🟥🟥🟥 100\r\n🟥🟥🟥🟥🟥 100 \r\n🟥🟥🟥🟥🟥 100\r\n')[0].rounds.length, 3);
+
+console.log('all parser tests passed');
