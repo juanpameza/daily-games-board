@@ -233,6 +233,12 @@ table.st tr.lead td.tot { position: relative; }
       <button type="submit" class="btn">Add me</button>
       <button type="button" class="btn ghost" id="identityCancel" hidden>Cancel</button>
     </form>
+    <form class="row" id="renameForm" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line)" hidden>
+      <label for="renameName" style="flex: 1 1 100%; font-weight: 600">Change how your name shows</label>
+      <input type="text" id="renameName" maxlength="40" autocomplete="off" aria-label="New display name">
+      <button type="submit" class="btn">Rename</button>
+      <span class="note" style="flex: 1 1 100%" id="renameNote">Your past results stay with you.</span>
+    </form>
   </section>
 
   <section id="viewToday" class="view" hidden>
@@ -471,8 +477,25 @@ table.st tr.lead td.tot { position: relative; }
       c.onclick = function () { setMe({ id: p.id, name: p.name }); closeIdentity(); };
       chips.appendChild(c);
     });
+    var canRename = !!(state.me && state.players.some(function (p) { return p.id === state.me.id; }));
+    $('renameForm').hidden = !canRename;
+    if (canRename) { $('renameName').value = state.me.name; $('renameNote').textContent = 'Your past results stay with you.'; }
     sec.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
+  $('renameForm').onsubmit = function (ev) {
+    ev.preventDefault();
+    if (!state.me) return;
+    var name = $('renameName').value.trim(); if (!name || name === state.me.name) return;
+    var id = state.me.id;
+    $('renameNote').textContent = 'Saving…';
+    sb('players?id=eq.' + encodeURIComponent(id), { method: 'PATCH', body: { name: name }, prefer: 'return=minimal' })
+      .then(function () {
+        var p = state.players.find(function (x) { return x.id === id; }); if (p) p.name = name;
+        setMe({ id: id, name: name });
+        closeIdentity();
+      })
+      .catch(function (e) { $('renameNote').textContent = 'Could not rename: ' + e.message; });
+  };
   function closeIdentity() { $('identity').hidden = true; render(); }
 
   $('whoBtn').onclick = function () { if ($('identity').hidden) openIdentity(true); else closeIdentity(); };
