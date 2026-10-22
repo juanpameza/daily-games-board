@@ -110,6 +110,9 @@ textarea { width: 100%; min-height: 110px; resize: vertical; font-family: ui-mon
 .gpanel { padding: 0; overflow: hidden; }
 .gpanel header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 10px 14px 6px; }
 .gpanel h3 { font-family: var(--font-display); font-weight: 700; font-size: 20px; text-transform: uppercase; letter-spacing: 0.02em; }
+a.glink { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+a.glink:hover, a.glink:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+a.glink .ext { width: 11px; height: 11px; fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .gpanel .meta { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
 .gpanel .empty { padding: 4px 14px 14px; color: var(--muted); font-size: 14px; }
 .ranks { list-style: none; margin: 0; padding: 0 0 6px; }
@@ -432,6 +435,17 @@ table.st tr.lead td.tot { position: relative; }
     s.appendChild(p); return s;
   }
   function isMe(id) { return state.me && state.me.id === id; }
+  // Game name as a link to the game itself, with a small "opens elsewhere" arrow.
+  function gameLink(g) {
+    var a = el('a', 'glink', GAMES[g].name); a.href = GAMES[g].url; a.target = '_blank'; a.rel = 'noopener';
+    a.title = 'Play ' + GAMES[g].name;
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('class', 'ext'); s.setAttribute('aria-hidden', 'true');
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', 'M7 17L17 7M9 7h8v8');
+    s.appendChild(p); a.appendChild(s);
+    return a;
+  }
 
   // Entries for one day and game, best first, with shared ranks. A win needs at least two entries.
   function ranked(day, game) {
@@ -675,7 +689,7 @@ table.st tr.lead td.tot { position: relative; }
     GAME_ORDER.forEach(function (g) {
       var rk = ranked(state.day, g);
       var card = el('section', 'card gpanel');
-      var h = el('header'); h.appendChild(el('h3', null, GAMES[g].name));
+      var h = el('header'); var h3 = el('h3'); h3.appendChild(gameLink(g)); h.appendChild(h3);
       var puzzle = rk.length && rk[0].e.puzzle ? '#' + rk[0].e.puzzle : '';
       h.appendChild(el('span', 'meta', puzzle || (rk.length ? rk.length + ' posted' : '')));
       card.appendChild(h);
@@ -721,7 +735,7 @@ table.st tr.lead td.tot { position: relative; }
   // ---------- game view ----------
   function renderGame() {
     var g = state.game; var G = GAMES[g];
-    $('gameTitle').textContent = G.name;
+    $('gameTitle').textContent = ''; $('gameTitle').appendChild(gameLink(g));
     $('gameSub').textContent = G.dir === 'asc' ? 'Fewer guesses wins' : 'Higher score wins';
     var days = daysInResults().filter(function (d) { return state.results.some(function (r) { return r.day === d && r.game === g; }); });
     var byDay = {}; days.forEach(function (d) { byDay[d] = ranked(d, g); });

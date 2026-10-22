@@ -7,11 +7,11 @@
 //   grid    emoji block kept for games that share a picture, or null
 
 const GAMES = {
-  wordle:    { name: 'Wordle',     short: 'W', dir: 'asc',  unit: 'guesses' },
-  perceptle: { name: 'Perceptle',  short: 'P', dir: 'desc', unit: 'pts' },
-  krillion:  { name: 'Krillion',   short: 'K', dir: 'desc', unit: 'pts' },
-  maptap:    { name: 'Maptap',     short: 'M', dir: 'desc', unit: 'pts' },
-  sizeitup:  { name: 'Size It Up', short: 'S', dir: 'desc', unit: 'pts' },
+  wordle:    { name: 'Wordle',     short: 'W', dir: 'asc',  unit: 'guesses', url: 'https://www.nytimes.com/games/wordle/index.html' },
+  perceptle: { name: 'Perceptle',  short: 'P', dir: 'desc', unit: 'pts',     url: 'https://perceptle.com' },
+  krillion:  { name: 'Krillion',   short: 'K', dir: 'desc', unit: 'pts',     url: 'https://krillion.org' },
+  maptap:    { name: 'Maptap',     short: 'M', dir: 'desc', unit: 'pts',     url: 'https://www.maptap.gg' },
+  sizeitup:  { name: 'Size It Up', short: 'S', dir: 'desc', unit: 'pts',     url: 'https://magnitudle.com/size-it-up' },
 };
 const GAME_ORDER = ['wordle', 'perceptle', 'krillion', 'maptap', 'sizeitup'];
 
