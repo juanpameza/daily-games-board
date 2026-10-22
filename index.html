@@ -190,7 +190,9 @@ table.st { border-collapse: collapse; width: 100%; font-variant-numeric: tabular
 table.st th, table.st td { padding: 8px 6px; text-align: center; white-space: nowrap; border-bottom: 1px solid var(--line); }
 table.st th { font-weight: 500; color: var(--muted); font-size: 13px; }
 table.st th.p, table.st td.p { text-align: left; }
-table.st td.p { font-weight: 500; display: flex; align-items: center; gap: 8px; }
+table.st td.p { font-weight: 500; }
+table.st td.p .pcell { display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; max-width: 160px; }
+table.st td.p .pcell span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 table.st td.c { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
 table.st td.c.z { color: var(--line); }
 table.st td.tot { font-family: var(--font-display); font-size: 22px; font-weight: 700; border-left: 1px solid var(--line); color: var(--accent); }
@@ -948,7 +950,7 @@ function compareScores(game, a, b) {
     if (!rows.length) { var tr0 = el('tr'); var td0 = el('td', 'p', 'Nothing posted in this period.'); td0.colSpan = GAME_ORDER.length + 3; td0.style.color = 'var(--muted)'; tr0.appendChild(td0); tb.appendChild(tr0); }
     rows.forEach(function (r, i) {
       var tr = el('tr', (isMe(r.p.id) ? 'is-me' : '') + (i === 0 && r.total > 0 ? ' lead' : ''));
-      var td = el('td', 'p'); td.appendChild(avatar(r.p.id, 20)); td.appendChild(el('span', null, r.p.name)); tr.appendChild(td);
+      var td = el('td', 'p'); var pc = el('span', 'pcell'); pc.appendChild(avatar(r.p.id, 20)); pc.appendChild(el('span', null, r.p.name)); td.appendChild(pc); tr.appendChild(td);
       GAME_ORDER.forEach(function (g) { var v = r.c[g] || 0; tr.appendChild(el('td', 'c num' + (v ? '' : ' z'), v ? String(v) : '·')); });
       tr.appendChild(el('td', 'tot num', String(r.total)));
       tr.appendChild(el('td', 'c num', String(r.days)));
