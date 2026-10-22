@@ -374,10 +374,11 @@ function parseKrillion(t) {
 function parseMaptap(t) {
   const m = t.match(/maptap\.gg\s+([A-Za-z]+\s+\d{1,2}(?:,?\s*\d{4})?)[ \t]*\n+([^\n]+)\n+\s*Final score:\s*(\d+)/iu);
   if (!m) return null;
+  // Five rounds in order. The emoji after each number is just the game's reaction to that score, not a round id.
   const rounds = [];
-  const re = new RegExp('(\\d+)\\s*(' + EMOJI + ')', 'gu');
+  const re = new RegExp('(\\d+)\\s*(?:' + EMOJI + ')?', 'gu');
   let r;
-  while ((r = re.exec(m[2])) !== null) rounds.push({ label: r[2], value: parseInt(r[1], 10) });
+  while ((r = re.exec(m[2])) !== null) rounds.push({ label: String(rounds.length + 1), value: parseInt(r[1], 10) });
   return {
     game: 'maptap',
     puzzle: null,
@@ -735,6 +736,7 @@ function compareScores(game, a, b) {
     var labels = []; var seen = {};
     rk.forEach(function (x) { (x.e.rounds || []).forEach(function (r) { if (!seen[r.label]) { seen[r.label] = true; labels.push(r.label); } }); });
     if (!labels.length) return null;
+    if (labels.every(function (l) { return /^\d+$/.test(l); })) labels.sort(function (a, b) { return a - b; });
     var best = {};
     labels.forEach(function (l) {
       var vals = rk.map(function (x) { var r = (x.e.rounds || []).find(function (q) { return q.label === l; }); return r ? r.value : null; }).filter(function (v) { return v != null; });
@@ -745,7 +747,7 @@ function compareScores(game, a, b) {
     wrap.appendChild(el('div', 'cap', 'By round'));
     var sc = el('div', 'tscroll'); var t = el('table', 'rt');
     var thead = el('thead'); var hr = el('tr'); hr.appendChild(el('th', 'p', ''));
-    labels.forEach(function (l, i) { hr.appendChild(el('th', 'lbl', game === 'sizeitup' ? 'R' + l : l)); });
+    labels.forEach(function (l) { hr.appendChild(el('th', 'lbl', /^\d+$/.test(l) ? 'R' + l : l)); });
     hr.appendChild(el('th', null, 'Total')); thead.appendChild(hr); t.appendChild(thead);
     var tb = el('tbody');
     rk.forEach(function (x) {

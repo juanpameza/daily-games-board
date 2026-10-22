@@ -48,7 +48,7 @@ assert.strictEqual(byGame.krillion.grid, '⬛🦑🫧🦑🦑⬛🫧');
 
 assert.strictEqual(byGame.maptap.score, 798);
 assert.deepStrictEqual(byGame.maptap.rounds.map(r => r.value), [80, 74, 100, 68, 80]);
-assert.deepStrictEqual(byGame.maptap.rounds.map(r => r.label), ['👏', '😂', '🎯', '🤨', '🤗']);
+assert.deepStrictEqual(byGame.maptap.rounds.map(r => r.label), ['1', '2', '3', '4', '5']);
 
 assert.strictEqual(byGame.sizeitup.score, 251);
 assert.deepStrictEqual(byGame.sizeitup.rounds.map(r => r.value), [0, 72, 97, 82, 0]);
@@ -60,6 +60,9 @@ assert.strictEqual(parseResults('Wordle 1,951 X/6*\n\n⬛⬛⬛⬛⬛')[0].displ
 assert.strictEqual(parseResults('Krillion #99 🦐\n140')[0].score, 140);
 assert.strictEqual(parseResults('Krillion #99 🦐\n140')[0].grid, null);
 assert.strictEqual(parseResults('www.maptap.gg October 22\n100🎯 55😂 61👏 90🤗 72🤨\nFinal score: 812')[0].score, 812);
+assert.deepStrictEqual(parseResults('www.maptap.gg October 22\n100🎯 55😂 61👏 90🤗 72🤨\nFinal score: 812')[0].rounds.map(r => r.value), [100, 55, 61, 90, 72]);
+// same reaction emoji twice must still give five separate rounds
+assert.deepStrictEqual(parseResults('www.maptap.gg October 22\n80👏 80👏 100🎯 68🤨 80👏\nFinal score: 408')[0].rounds.map(r => r.label + ':' + r.value), ['1:80', '2:80', '3:100', '4:68', '5:80']);
 assert.strictEqual(parseResults('Perceptle #97 - A (91)\n🔢 90  🎯 88  📐 95  🥁 92  ✂️ 90\nhttps://perceptle.com')[0].score, 91);
 assert.strictEqual(parseResults('hello there').length, 0);
 

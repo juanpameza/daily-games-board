@@ -74,10 +74,11 @@ function parseKrillion(t) {
 function parseMaptap(t) {
   const m = t.match(/maptap\.gg\s+([A-Za-z]+\s+\d{1,2}(?:,?\s*\d{4})?)[ \t]*\n+([^\n]+)\n+\s*Final score:\s*(\d+)/iu);
   if (!m) return null;
+  // Five rounds in order. The emoji after each number is just the game's reaction to that score, not a round id.
   const rounds = [];
-  const re = new RegExp('(\\d+)\\s*(' + EMOJI + ')', 'gu');
+  const re = new RegExp('(\\d+)\\s*(?:' + EMOJI + ')?', 'gu');
   let r;
-  while ((r = re.exec(m[2])) !== null) rounds.push({ label: r[2], value: parseInt(r[1], 10) });
+  while ((r = re.exec(m[2])) !== null) rounds.push({ label: String(rounds.length + 1), value: parseInt(r[1], 10) });
   return {
     game: 'maptap',
     puzzle: null,

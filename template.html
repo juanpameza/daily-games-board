@@ -611,6 +611,7 @@ table.st tr.lead td.tot { position: relative; }
     var labels = []; var seen = {};
     rk.forEach(function (x) { (x.e.rounds || []).forEach(function (r) { if (!seen[r.label]) { seen[r.label] = true; labels.push(r.label); } }); });
     if (!labels.length) return null;
+    if (labels.every(function (l) { return /^\d+$/.test(l); })) labels.sort(function (a, b) { return a - b; });
     var best = {};
     labels.forEach(function (l) {
       var vals = rk.map(function (x) { var r = (x.e.rounds || []).find(function (q) { return q.label === l; }); return r ? r.value : null; }).filter(function (v) { return v != null; });
@@ -621,7 +622,7 @@ table.st tr.lead td.tot { position: relative; }
     wrap.appendChild(el('div', 'cap', 'By round'));
     var sc = el('div', 'tscroll'); var t = el('table', 'rt');
     var thead = el('thead'); var hr = el('tr'); hr.appendChild(el('th', 'p', ''));
-    labels.forEach(function (l, i) { hr.appendChild(el('th', 'lbl', game === 'sizeitup' ? 'R' + l : l)); });
+    labels.forEach(function (l) { hr.appendChild(el('th', 'lbl', /^\d+$/.test(l) ? 'R' + l : l)); });
     hr.appendChild(el('th', null, 'Total')); thead.appendChild(hr); t.appendChild(thead);
     var tb = el('tbody');
     rk.forEach(function (x) {
