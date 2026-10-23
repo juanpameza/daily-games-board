@@ -64,6 +64,15 @@ assert.deepStrictEqual(parseResults('www.maptap.gg October 22\n100🎯 55😂 61
 // same reaction emoji twice must still give five separate rounds
 assert.deepStrictEqual(parseResults('www.maptap.gg October 22\n80👏 80👏 100🎯 68🤨 80👏\nFinal score: 408')[0].rounds.map(r => r.label + ':' + r.value), ['1:80', '2:80', '3:100', '4:68', '5:80']);
 assert.strictEqual(parseResults('Perceptle #97 - A (91)\n🔢 90  🎯 88  📐 95  🥁 92  ✂️ 90\nhttps://perceptle.com')[0].score, 91);
+// Perceptle sometimes adds an emoji after the number and uses an en or em dash (seen on iOS)
+['Perceptle #98 🃏 – F (31)', 'Perceptle #98 🃏 — F (31)', 'Perceptle #98 - F (31)', 'Perceptle #98 🏆 – A+ (97)'].forEach(function (head) {
+  const r = parseResults(head + '\n🔢 99  🎯 0  📐 1  🥁 27  ✂️ 26\nhttps://perceptle.com');
+  assert.strictEqual(r.length, 1, 'parses: ' + head);
+  assert.strictEqual(r[0].puzzle, 98);
+  assert.deepStrictEqual(r[0].rounds.map(x => x.value), [99, 0, 1, 27, 26]);
+});
+assert.strictEqual(parseResults('Perceptle #98 🃏 – F (31)\n🔢 99  🎯 0  📐 1  🥁 27  ✂️ 26')[0].display, 'F (31)');
+assert.strictEqual(parseResults('Perceptle #98 🏆 – A+ (97)\n🔢 99  🎯 0  📐 1  🥁 27  ✂️ 26')[0].display, 'A+ (97)');
 assert.strictEqual(parseResults('hello there').length, 0);
 
 // Windows line endings and trailing whitespace
